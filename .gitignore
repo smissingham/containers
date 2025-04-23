@@ -1,0 +1,6 @@
+# IGNORE FILES
+.env
+compose.private.yml
+
+# IGNORE FOLDERS
+AppData/

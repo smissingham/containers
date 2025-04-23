@@ -1,0 +1,23 @@
+name: home
+services:
+  searxng:
+    container_name: searxng
+    image: searxng/searxng
+    restart: unless-stopped
+    environment:
+      # - TZ=${TZ}
+      # - PUID=${PUID}
+      # - PGID=${PGID}
+      - INSTANCE_NAME=smissingham
+      - BASE_URL="https://searxng.${ROOT_DOMAIN}"
+    ports:
+      - "6060:8080"
+    volumes:
+      - ${APP_DATA}/home/searxng:/etc/searxng
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.searxng.rule=Host(`searxng.${ROOT_DOMAIN}`)
+      - traefik.http.routers.searxng.tls=true
+      - traefik.http.routers.searxng.entrypoints=websecure
+      - traefik.http.routers.searxng.tls.certresolver=resolver
+      - traefik.http.services.searxng.loadbalancer.server.port=8080
