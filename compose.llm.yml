@@ -3,7 +3,7 @@ services:
   open-webui:
     container_name: open-webui
     image: ghcr.io/open-webui/open-webui:main
-    restart: unless-stopped
+    restart: always
     environment:
       - TZ=${TZ}
       - "OLLAMA_BASE_URL=http://ollama:11434"
@@ -11,8 +11,7 @@ services:
       - ${APP_DATA}/llm/open-webui:/app/backend/data
     depends_on:
       - ollama
-    # ports:
-    #   - 9090:8080
+      - litellm
     labels:
       - traefik.enable=true
       - traefik.http.routers.openwebui.rule=Host(`chat.${ROOT_DOMAIN}`)
@@ -24,39 +23,38 @@ services:
   ollama:
     container_name: ollama
     image: ollama/ollama
-    restart: unless-stopped
+    restart: always
     hostname: ollama
     environment:
       - TZ=${TZ}
       - OLLAMA_KEEP_ALIVE=24h
     volumes:
       - ${APP_DATA}/llm/ollama:/root/.ollama
-    # ports:
-    #   - "11434:11434"
-    # podman syntax for nvidia support
     devices:
       - nvidia.com/gpu=all
     labels:
       - traefik.enable=true
-      - traefik.http.routers.ollama.rule=Host(`llm.${ROOT_DOMAIN}`)
+      - traefik.http.routers.ollama.rule=Host(`ollama.${ROOT_DOMAIN}`)
       - traefik.http.routers.ollama.tls=true
       - traefik.http.routers.ollama.entrypoints=websecure
       - traefik.http.routers.ollama.tls.certresolver=resolver
       - traefik.http.services.ollama.loadbalancer.server.port=11434
-    # nixos docker rootless syntax for nvidia support
-    #    deploy:
-    #      resources:
-    #        reservations:
-    #          devices:
-    #            - driver: cdi
-    #              device_ids:
-    #                - nvidia.com/gpu=all
-    #labels:
-    #- traefik.enable=true
-    #- traefik.http.routers.ollama.rule=Host(`${SECRET_OLLAMA_SUBDOMAIN}.${ROOT_DOMAIN}`)
-    #- traefik.http.routers.ollama.tls=true
-    #- traefik.http.routers.ollama.entrypoints=websecure
-    #- traefik.http.routers.ollama.tls.certresolver=resolver
-    #- traefik.http.services.ollama.loadbalancer.server.port=11434
-    #- traefik.http.routers.ollama.middlewares=auth
-    #- traefik.http.middlewares.auth.basicauth.users=${BASIC_AUTH_USER}:${BASIC_AUTH_PASS}
+
+  litellm:
+    container_name: litellm
+    restart: always
+    image: ghcr.io/berriai/litellm:main-latest
+    env_file: ".env"
+    # ports:
+    #   - "4000:4000"
+    volumes:
+      - ${APP_CONFIG}/llm/litellm/config:/config
+    command:
+      - --config=/config/config.yaml
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.litellm.rule=Host(`litellm.${ROOT_DOMAIN}`)
+      - traefik.http.routers.litellm.tls=true
+      - traefik.http.routers.litellm.entrypoints=websecure
+      - traefik.http.routers.litellm.tls.certresolver=resolver
+      - traefik.http.services.litellm.loadbalancer.server.port=4000

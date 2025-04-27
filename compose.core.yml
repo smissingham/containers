@@ -3,10 +3,11 @@ services:
   traefik:
     container_name: traefik
     image: traefik:v2.11
-    restart: unless-stopped
+    restart: always
     environment:
       - CF_DNS_API_TOKEN=${CF_DNS_API_TOKEN}
-      - LEGO_DISABLE_CNAME_SUPPORT=true # prevent cloudflare trying to resolve cname pointing at private tailnet
+      # prevent cloudflare trying to resolve cname pointed at private tailnet
+      - LEGO_DISABLE_CNAME_SUPPORT=true
     ports:
       #- "80:80"
       - "443:443"

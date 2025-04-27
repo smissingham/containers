@@ -1,6 +1,7 @@
 # IGNORE FILES
 .env
 compose.private.yml
+.st*
 
 # IGNORE FOLDERS
 AppData/

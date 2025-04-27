@@ -1,10 +1,9 @@
 name: games
 services:
-
   factorio:
     image: factoriotools/factorio:stable
     container_name: factorio
-    restart: unless-stopped
+    restart: always
     ports:
       - "34197:34197/udp"
       - "27015:27015/tcp"

@@ -3,15 +3,10 @@ services:
   searxng:
     container_name: searxng
     image: searxng/searxng
-    restart: unless-stopped
+    restart: always
     environment:
-      # - TZ=${TZ}
-      # - PUID=${PUID}
-      # - PGID=${PGID}
       - INSTANCE_NAME=smissingham
       - BASE_URL="https://searxng.${ROOT_DOMAIN}"
-    ports:
-      - "6060:8080"
     volumes:
       - ${APP_DATA}/home/searxng:/etc/searxng
     labels:
@@ -21,3 +16,47 @@ services:
       - traefik.http.routers.searxng.entrypoints=websecure
       - traefik.http.routers.searxng.tls.certresolver=resolver
       - traefik.http.services.searxng.loadbalancer.server.port=8080
+
+  mqtt:
+    container_name: mqtt
+    image: eclipse-mosquitto:latest
+    restart: always
+    ports:
+      - 1883:1883
+      - 9001:9001
+    volumes:
+      - ${APP_DATA}/home/mosquitto/config:/mosquitto/config
+      - ${APP_DATA}/home/mosquitto/data:/mosquitto/data
+      - ${APP_DATA}/home/mosquitto/log:/mosquitto/log
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.mqtt.rule=Host(`mqtt.${ROOT_DOMAIN}`)
+      - traefik.http.routers.mqtt.tls=true
+      - traefik.http.routers.mqtt.entrypoints=websecure
+      - traefik.http.routers.mqtt.tls.certresolver=resolver
+      - traefik.http.services.mqtt.loadbalancer.server.port=9001
+
+  owntracks-recorder:
+    container_name: owntracks-recorder
+    image: owntracks/recorder
+    restart: always
+    environment:
+      - OTR_HOST=mqtt
+    ports:
+      - 8083:8083
+    volumes:
+      - ${APP_DATA}/home/owntracks-recorder/store:/store
+      - ${APP_DATA}/home/owntracks-recorder/config:/config
+    depends_on:
+      - mqtt
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.owntracks.rule=Host(`owntracks.${ROOT_DOMAIN}`)
+      - traefik.http.routers.owntracks.tls=true
+      - traefik.http.routers.owntracks.entrypoints=websecure
+      - traefik.http.routers.owntracks.tls.certresolver=resolver
+      - traefik.http.services.owntracks.loadbalancer.server.port=8083
+
+
+
+
