@@ -1,12 +1,40 @@
 name: llm
 services:
+  searxng:
+    container_name: searxng
+    image: searxng/searxng
+    restart: always
+    environment:
+      - INSTANCE_NAME=smissingham
+      - BASE_URL="https://searxng.${ROOT_DOMAIN}"
+    volumes:
+      - ${APP_DATA}/llm/searxng:/etc/searxng
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.searxng.rule=Host(`searxng.${ROOT_DOMAIN}`)
+      - traefik.http.routers.searxng.tls=true
+      - traefik.http.routers.searxng.entrypoints=websecure
+      - traefik.http.routers.searxng.tls.certresolver=resolver
+      - traefik.http.services.searxng.loadbalancer.server.port=8080
+
   open-webui:
     container_name: open-webui
     image: ghcr.io/open-webui/open-webui:main
     restart: always
     environment:
+      # Options: https://docs.openwebui.com/getting-started/env-configuration/
       - TZ=${TZ}
-      - "OLLAMA_BASE_URL=http://ollama:11434"
+      #- OLLAMA_BASE_URL=http://ollama:11434
+
+      - WEBUI_AUTH=False
+      - WEBUI_URL=https://chat.${ROOT_DOMAIN}
+
+      - ENABLE_WEB_SEARCH=True
+      - WEB_SEARCH_ENGINE=searxng
+      - SEARXNG_QUERY_URL=http://searxng:8080/search?q=<query>
+
+      - ENABLE_OPENAI_API=True
+      - OPENAI_API_BASE_URL=https://litellm.${ROOT_DOMAIN}/v1
     volumes:
       - ${APP_DATA}/llm/open-webui:/app/backend/data
     depends_on:
