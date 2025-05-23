@@ -5,3 +5,4 @@ compose.private.yml
 
 # IGNORE FOLDERS
 AppData/
+AppConfig/media/wireguard

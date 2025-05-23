@@ -24,6 +24,11 @@ model_list:
       model: openai/gpt-4.1:mini
       api_key: os.environ/OPENAI_API_KEY
 
+  - model_name: ANT-claude-4.0:opus
+    litellm_params:
+      model: claude-opus-4-20250514
+      api_key: "os.environ/ANTHROPIC_API_KEY"
+  
   - model_name: ANT-claude-3.5:sonnet
     litellm_params:
       model: claude-3-5-sonnet-20240620
@@ -58,3 +63,37 @@ model_list:
     litellm_params:
       model: ollama/hf.co/bartowski/google_gemma-3-27b-it-qat-GGUF:Q4_K_M
       base_url: http://ollama:11434
+
+  - model_name: OLL-qwen-3:14b
+    litellm_params:
+      model: ollama/qwen3:14b
+      base_url: http://ollama:11434
+
+  - model_name: OLL-deepcoder:14b
+    litellm_params:
+      model: ollama/deepcoder:14b
+      base_url: http://ollama:11434
+
+  # - model_name: GGL-gemini-2.5-flash
+  #   litellm_params:
+  #     model: gemini/gemini-2.5-flash-preview-04-17
+  #     api_key: os.environ/GEMINI_API_KEY
+  #
+  - model_name: GGL-gemini-2.5-pro
+    litellm_params:
+      model: gemini/gemini-2.5-pro-preview-05-06
+      api_key: os.environ/GEMINI_API_KEY
+
+  - model_name: ORT-gemini-2.5-flash
+    litellm_params:
+      model: openrouter/google/gemini-2.5-flash-preview
+      api_key: os.environ/OPENROUTER_API_KEY
+ 
+  - model_name: ORT-gemini-2.5-flash-thinking
+    litellm_params:
+      model: openrouter/google/gemini-2.5-flash-preview:thinking
+      api_key: os.environ/OPENROUTER_API_KEY 
+  # - model_name: ORT-gemini-2.5-pro
+  #   litellm_params:
+  #     model: openrouter/google/gemini-2.5-pro-preview-05-06
+  #     api_key: os.environ/OPENROUTER_API_KEY

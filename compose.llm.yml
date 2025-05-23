@@ -21,25 +21,38 @@ services:
     container_name: open-webui
     image: ghcr.io/open-webui/open-webui:main
     restart: always
-    environment:
-      # Options: https://docs.openwebui.com/getting-started/env-configuration/
-      - TZ=${TZ}
-      #- OLLAMA_BASE_URL=http://ollama:11434
-
-      - WEBUI_AUTH=False
-      - WEBUI_URL=https://chat.${ROOT_DOMAIN}
-
-      - ENABLE_WEB_SEARCH=True
-      - WEB_SEARCH_ENGINE=searxng
-      - SEARXNG_QUERY_URL=http://searxng:8080/search?q=<query>
-
-      - ENABLE_OPENAI_API=True
-      - OPENAI_API_BASE_URL=https://litellm.${ROOT_DOMAIN}/v1
-    volumes:
-      - ${APP_DATA}/llm/open-webui:/app/backend/data
     depends_on:
       - ollama
       - litellm
+    environment:
+      # Options: https://docs.openwebui.com/getting-started/env-configuration/
+      - TZ=${TZ}
+      
+      # force config reload from these env vars instead of persisting to appdata folder
+      - ENABLE_PERSISTENT_CONFIG=False
+
+      - ENABLE_DIRECT_CONNECTIONS=False
+      - ENABLE_OLLAMA_API=False
+      - OLLAMA_BASE_URL=http://ollama:11434
+
+      #- WEBUI_AUTH=False
+      - WEBUI_URL=https://chat.${ROOT_DOMAIN}
+
+      - ENABLE_WEB_SEARCH=True
+      - WEB_SEARCH_ENGINE=tavily
+      - SEARXNG_QUERY_URL=http://searxng:8080/search?q=<query>
+
+      - TAVILY_API_KEY=${TAVILY_API_KEY}
+
+      - ENABLE_OPENAI_API=True
+      - OPENAI_API_BASE_URL=https://litellm.${ROOT_DOMAIN}/v1
+      - PDF_EXTRACT_IMAGES=True
+
+      - USE_CUDA_DOCKER=True
+    volumes:
+      - ${APP_DATA}/llm/open-webui:/app/backend/data
+    devices:
+      - nvidia.com/gpu=all # allow gpu access for local whisper/embedding model acceleration
     labels:
       - traefik.enable=true
       - traefik.http.routers.openwebui.rule=Host(`chat.${ROOT_DOMAIN}`)
@@ -50,7 +63,7 @@ services:
 
   ollama:
     container_name: ollama
-    image: ollama/ollama
+    image: ollama/ollama:latest
     restart: always
     hostname: ollama
     environment:
@@ -86,3 +99,41 @@ services:
       - traefik.http.routers.litellm.entrypoints=websecure
       - traefik.http.routers.litellm.tls.certresolver=resolver
       - traefik.http.services.litellm.loadbalancer.server.port=4000
+
+  comfyui:
+    container_name: comfyui
+    image: docker.io/yanwk/comfyui-boot:cu124-megapak
+    restart: always
+    environment:
+      - TZ=${TZ}
+      - LD_LIBRARY_PATH=/lib:/lib
+      #- CLI_ARGS=""
+    volumes:
+      - ${APP_DATA}/llm/comfyui:/root
+    devices:
+      - nvidia.com/gpu=all
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.comfyui.rule=Host(`comfyui.${ROOT_DOMAIN}`)
+      - traefik.http.routers.comfyui.tls=true
+      - traefik.http.routers.comfyui.entrypoints=websecure
+      - traefik.http.routers.comfyui.tls.certresolver=resolver
+      - traefik.http.services.comfyui.loadbalancer.server.port=8188
+  
+  kokoro:
+    container_name: kokoro
+    image: ghcr.io/remsky/kokoro-fastapi-gpu
+    restart: always
+    environment:
+      - TZ=${TZ}
+    volumes:
+      - ${APP_DATA}/llm/kokoro:/data
+    devices:
+      - nvidia.com/gpu=all
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.kokoro.rule=Host(`kokoro.${ROOT_DOMAIN}`)
+      - traefik.http.routers.kokoro.tls=true
+      - traefik.http.routers.kokoro.entrypoints=websecure
+      - traefik.http.routers.kokoro.tls.certresolver=resolver
+      - traefik.http.services.kokoro.loadbalancer.server.port=8000
