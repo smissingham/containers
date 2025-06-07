@@ -120,6 +120,7 @@ services:
     env_file: ".env"
     volumes:
       - ${APP_CONFIG}/llm/mcpo:/app/config
+      - ${APP_DATA}/llm/mcpo:/app/data
     command:
       - '--config'
       - '/app/config/config.json'
