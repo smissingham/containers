@@ -51,6 +51,7 @@ services:
 
       - ENABLE_OPENAI_API=True
       - OPENAI_API_BASE_URL=https://litellm.${ROOT_DOMAIN}/v1
+      - OPENAI_API_KEY=${LITELLM_MASTER_KEY}
       - PDF_EXTRACT_IMAGES=True
 
       - USE_CUDA_DOCKER=True
@@ -94,12 +95,12 @@ services:
       - shared
     env_file: ".env"
     environment:
-      #- LITELLM_MASTER_KEY="sk-1234"
+      - LITELLM_MASTER_KEY=${LITELLM_MASTER_KEY}
       - UI_USERNAME=${ADMIN_USERNAME}
       - UI_PASSWORD=${ADMIN_PASSWORD}
       - DATABASE_URL=postgresql://${ADMIN_USERNAME}:${ADMIN_PASSWORD}@postgres:5432/litellm
-      # ports:
-    #   - "4000:4000"
+      - LITELLM_LOG=ERROR
+      - JSON_LOGS=True
     volumes:
       - ${APP_CONFIG}/llm/litellm/config:/config
     command:
@@ -122,6 +123,8 @@ services:
     command:
       - '--config'
       - '/app/config/config.json'
+    ports:
+      - 8000:8000
     labels:
       - traefik.enable=true
       - traefik.http.routers.mcpo.rule=Host(`mcpo.${ROOT_DOMAIN}`)
