@@ -1,38 +1,46 @@
+general_settings:
+  store_model_in_db: true
+  store_prompts_in_spend_logs: true
 model_list:
-  - model_name: GRQ-llama3-8b:8192
-    litellm_params:
-      model: groq/llama3-8b-8192
-      api_key:  os.environ/GROQ_API_KEY
+  # - model_name: GRQ-llama3-8b:8192
+  #   litellm_params:
+  #     model: groq/llama3-8b-8192
+  #     api_key:  os.environ/GROQ_API_KEY
 
   - model_name: GRQ-deepseek-r1:70b
     litellm_params:
       model: groq/deepseek-r1-distill-llama-70b
       api_key:  os.environ/GROQ_API_KEY
 
-  - model_name: GRQ-qwen-qwq:32b
-    litellm_params:
-      model: groq/qwen-qwq-32b
-      api_key:  os.environ/GROQ_API_KEY
+  # - model_name: GRQ-qwen-qwq:32b
+  #   litellm_params:
+  #     model: groq/qwen-qwq-32b
+  #     api_key:  os.environ/GROQ_API_KEY
 
   - model_name: OAI-gpt-4.1
     litellm_params:
       model: openai/gpt-4.1
       api_key: os.environ/OPENAI_API_KEY
 
-  - model_name: OAI-gpt-4.1:mini
-    litellm_params:
-      model: openai/gpt-4.1:mini
-      api_key: os.environ/OPENAI_API_KEY
+  # - model_name: OAI-gpt-4.1:mini
+  #   litellm_params:
+  #     model: openai/gpt-4.1:mini
+  #     api_key: os.environ/OPENAI_API_KEY
 
   - model_name: ANT-claude-4.0:opus
     litellm_params:
       model: claude-opus-4-20250514
       api_key: "os.environ/ANTHROPIC_API_KEY"
-  
-  - model_name: ANT-claude-3.5:sonnet
+ 
+  - model_name: ANT-claude-4.0:sonnet
     litellm_params:
-      model: claude-3-5-sonnet-20240620
-      api_key: "os.environ/ANTHROPIC_API_KEY"
+      model: claude-sonnet-4-20250514
+      api_key: "os.environ/ANTHROPIC_API_KEY" 
+
+  # - model_name: ANT-claude-3.5:sonnet
+  #   litellm_params:
+  #     model: claude-3-5-sonnet-20240620
+  #     api_key: "os.environ/ANTHROPIC_API_KEY"
 
   - model_name: ANT-claude-3.7:sonnet
     litellm_params:
@@ -49,20 +57,20 @@ model_list:
       model: ollama/gemma3:12b-it-qat
       base_url: http://ollama:11434
 
-  - model_name: OLL-gemma-3:27b-q3s
-    litellm_params:
-      model: ollama/hf.co/bartowski/google_gemma-3-27b-it-qat-GGUF:Q3_K_S
-      base_url: http://ollama:11434
+  # - model_name: OLL-gemma-3:27b-q3s
+  #   litellm_params:
+  #     model: ollama/hf.co/bartowski/google_gemma-3-27b-it-qat-GGUF:Q3_K_S
+  #     base_url: http://ollama:11434
 
-  - model_name: OLL-gemma-3:27b-q4s
-    litellm_params:
-      model: ollama/hf.co/bartowski/google_gemma-3-27b-it-qat-GGUF:Q4_K_S
-      base_url: http://ollama:11434
+  # - model_name: OLL-gemma-3:27b-q4s
+  #   litellm_params:
+  #     model: ollama/hf.co/bartowski/google_gemma-3-27b-it-qat-GGUF:Q4_K_S
+  #     base_url: http://ollama:11434
 
-  - model_name: OLL-gemma-3:27b-q4m
-    litellm_params:
-      model: ollama/hf.co/bartowski/google_gemma-3-27b-it-qat-GGUF:Q4_K_M
-      base_url: http://ollama:11434
+  # - model_name: OLL-gemma-3:27b-q4m
+  #   litellm_params:
+  #     model: ollama/hf.co/bartowski/google_gemma-3-27b-it-qat-GGUF:Q4_K_M
+  #     base_url: http://ollama:11434
 
   - model_name: OLL-qwen-3:14b
     litellm_params:

@@ -1,4 +1,9 @@
 name: llm
+
+networks:
+  shared:
+    external: true
+
 services:
   searxng:
     container_name: searxng
@@ -85,8 +90,15 @@ services:
     container_name: litellm
     restart: always
     image: ghcr.io/berriai/litellm:main-latest
+    networks:
+      - shared
     env_file: ".env"
-    # ports:
+    environment:
+      #- LITELLM_MASTER_KEY="sk-1234"
+      - UI_USERNAME=${ADMIN_USERNAME}
+      - UI_PASSWORD=${ADMIN_PASSWORD}
+      - DATABASE_URL=postgresql://${ADMIN_USERNAME}:${ADMIN_PASSWORD}@postgres:5432/litellm
+      # ports:
     #   - "4000:4000"
     volumes:
       - ${APP_CONFIG}/llm/litellm/config:/config
@@ -99,41 +111,60 @@ services:
       - traefik.http.routers.litellm.entrypoints=websecure
       - traefik.http.routers.litellm.tls.certresolver=resolver
       - traefik.http.services.litellm.loadbalancer.server.port=4000
-
-  comfyui:
-    container_name: comfyui
-    image: docker.io/yanwk/comfyui-boot:cu124-megapak
-    restart: always
-    environment:
-      - TZ=${TZ}
-      - LD_LIBRARY_PATH=/lib:/lib
-      #- CLI_ARGS=""
-    volumes:
-      - ${APP_DATA}/llm/comfyui:/root
-    devices:
-      - nvidia.com/gpu=all
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.comfyui.rule=Host(`comfyui.${ROOT_DOMAIN}`)
-      - traefik.http.routers.comfyui.tls=true
-      - traefik.http.routers.comfyui.entrypoints=websecure
-      - traefik.http.routers.comfyui.tls.certresolver=resolver
-      - traefik.http.services.comfyui.loadbalancer.server.port=8188
   
-  kokoro:
-    container_name: kokoro
-    image: ghcr.io/remsky/kokoro-fastapi-gpu
+  mcpo:
+    container_name: mcpo
     restart: always
-    environment:
-      - TZ=${TZ}
+    image: ghcr.io/open-webui/mcpo:main
+    env_file: ".env"
     volumes:
-      - ${APP_DATA}/llm/kokoro:/data
-    devices:
-      - nvidia.com/gpu=all
+      - ${APP_CONFIG}/llm/mcpo:/app/config
+    command:
+      - '--config'
+      - '/app/config/config.json'
     labels:
       - traefik.enable=true
-      - traefik.http.routers.kokoro.rule=Host(`kokoro.${ROOT_DOMAIN}`)
-      - traefik.http.routers.kokoro.tls=true
-      - traefik.http.routers.kokoro.entrypoints=websecure
-      - traefik.http.routers.kokoro.tls.certresolver=resolver
-      - traefik.http.services.kokoro.loadbalancer.server.port=8000
+      - traefik.http.routers.mcpo.rule=Host(`mcpo.${ROOT_DOMAIN}`)
+      - traefik.http.routers.mcpo.tls=true
+      - traefik.http.routers.mcpo.entrypoints=websecure
+      - traefik.http.routers.mcpo.tls.certresolver=resolver
+      - traefik.http.services.mcpo.loadbalancer.server.port=8000
+ 
+
+  # comfyui:
+  #   container_name: comfyui
+  #   image: docker.io/yanwk/comfyui-boot:cu124-megapak
+  #   restart: always
+  #   environment:
+  #     - TZ=${TZ}
+  #     - LD_LIBRARY_PATH=/lib:/lib
+  #     #- CLI_ARGS=""
+  #   volumes:
+  #     - ${APP_DATA}/llm/comfyui:/root
+  #   devices:
+  #     - nvidia.com/gpu=all
+  #   labels:
+  #     - traefik.enable=true
+  #     - traefik.http.routers.comfyui.rule=Host(`comfyui.${ROOT_DOMAIN}`)
+  #     - traefik.http.routers.comfyui.tls=true
+  #     - traefik.http.routers.comfyui.entrypoints=websecure
+  #     - traefik.http.routers.comfyui.tls.certresolver=resolver
+  #     - traefik.http.services.comfyui.loadbalancer.server.port=8188
+  
+  # kokoro:
+  #   container_name: kokoro
+  #   image: ghcr.io/remsky/kokoro-fastapi-gpu
+  #   restart: always
+  #   environment:
+  #     - TZ=${TZ}
+  #   volumes:
+  #     - ${APP_DATA}/llm/kokoro:/data
+  #   devices:
+  #     - nvidia.com/gpu=all
+  #   labels:
+  #     - traefik.enable=true
+  #     - traefik.http.routers.kokoro.rule=Host(`kokoro.${ROOT_DOMAIN}`)
+  #     - traefik.http.routers.kokoro.tls=true
+  #     - traefik.http.routers.kokoro.entrypoints=websecure
+  #     - traefik.http.routers.kokoro.tls.certresolver=resolver
+  #     - traefik.http.services.kokoro.loadbalancer.server.port=8000

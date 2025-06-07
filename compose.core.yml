@@ -1,4 +1,9 @@
 name: core
+
+networks:
+  shared:
+    external: true
+
 services:
   traefik:
     container_name: traefik
@@ -28,3 +33,23 @@ services:
       - --certificatesresolvers.resolver.acme.dnschallenge.resolvers=1.1.1.1,1.0.0.1
       - --certificatesresolvers.resolver.acme.email=${ADMIN_EMAIL}
       - --certificatesresolvers.resolver.acme.storage=/letsencrypt/acme.json
+  
+  postgres:
+    container_name: postgres
+    image: postgres
+    volumes:
+      - ${APP_DATA}/core/postgres:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=${ADMIN_USERNAME}
+      - POSTGRES_PASSWORD=${ADMIN_PASSWORD}
+  
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    ports:
+      - 12345:80
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${ADMIN_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${ADMIN_PASSWORD}
