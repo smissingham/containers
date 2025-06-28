@@ -39,8 +39,8 @@ services:
     image: postgres
     volumes:
       - ${APP_DATA}/core/postgres:/var/lib/postgresql/data
-    ports:
-      - 5432:5432
+    # ports:
+    #   - 5432:5432
     environment:
       - POSTGRES_USER=${ADMIN_USERNAME}
       - POSTGRES_PASSWORD=${ADMIN_PASSWORD}
@@ -48,8 +48,69 @@ services:
   pgadmin:
     container_name: pgadmin
     image: dpage/pgadmin4
-    ports:
-      - 12345:80
+    # ports:
+    #   - 12345:80
     environment:
       - PGADMIN_DEFAULT_EMAIL=${ADMIN_EMAIL}
       - PGADMIN_DEFAULT_PASSWORD=${ADMIN_PASSWORD}
+  
+  redis:
+    container_name: redis
+    image: redis:alpine
+    restart: always 
+    # ports:
+    #   - 6379:6379
+    volumes:
+      - ${APP_DATA}/core/redis:/data
+    command: redis-server --save 60 1 --loglevel warning
+  
+  elasticsearch:
+    container_name: elasticsearch
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.0.2
+    restart: always
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=true
+      - bootstrap.memory_lock=true
+      - ELASTIC_USERNAME=${ADMIN_USERNAME}
+      - ELASTIC_PASSWORD=${ADMIN_PASSWORD}
+    ports:
+      - 9200:9200
+    #volumes:
+      #- ${APP_DATA}/core/elasticsearch:/usr/share/elasticsearch/data
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.elastic.rule=Host(`elastic.${ROOT_DOMAIN}`)
+      - traefik.http.routers.elastic.tls=true
+      - traefik.http.routers.elastic.entrypoints=websecure
+      - traefik.http.routers.elastic.tls.certresolver=resolver
+      - traefik.http.services.elastic.loadbalancer.server.port=9200
+
+  mysql:
+    container_name: mysql
+    image: mysql:8
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=${ADMIN_PASSWORD}
+      - MYSQL_USER=${ADMIN_USERNAME}
+      - MYSQL_PASSWORD=${ADMIN_PASSWORD}
+    # ports:
+    #   - 3306:3306
+    volumes:
+      - ${APP_DATA}/core/mysql:/var/lib/mysql
+  
+  minio:
+    container_name: minio
+    image: minio/minio
+    restart: always
+    environment:
+      - MINIO_ROOT_USER=${ADMIN_USERNAME}
+      - MINIO_ROOT_PASSWORD=${ADMIN_PASSWORD}
+    # ports:
+    #   - 9000:9000
+    #   - 9001:9001
+    volumes:
+      - ${APP_DATA}/core/minio:/data
+    command: server /data --console-address ":9001"
+  
+  

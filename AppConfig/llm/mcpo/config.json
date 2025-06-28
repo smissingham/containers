@@ -36,8 +36,18 @@
       "command": "npx",
       "args": [
         "-y",
-        "tavily-mcp@0.2.2"
+        "tavily-mcp@0.2.3"
       ]
+    },
+    "mcp-obsidian": {
+      "command": "uvx",
+      "args": [
+        "mcp-obsidian"
+      ],
+      "env": {
+        "OBSIDIAN_API_KEY": "2350a5c75c9fc8146c052be2f2249958ca63ca061612abfc8c062d7b32af0f5d",
+        "OBSIDIAN_HOST": "https://plutus:27124"
+      }
     }
   }
 }

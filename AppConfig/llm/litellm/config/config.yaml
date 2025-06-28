@@ -7,15 +7,27 @@ model_list:
   # Common use cases, models assigned by use case as name
   - model_name: chat-completion
     litellm_params:
-      model: claude-3-7-sonnet-20250219
+      model: openrouter/google/gemini-2.5-flash-preview:thinking
 
   - model_name: code-agent
     litellm_params:
-      model: claude-3-7-sonnet-20250219
+      model: gemini/gemini-2.5-pro-preview-05-06
+
+  - model_name: code-completion
+    litellm_params:
+      model: openrouter/google/gemini-2.5-flash-preview
 
   - model_name: code-fim-completion
     litellm_params:
       model: openrouter/google/gemini-2.5-flash-preview
+
+  - model_name: rag-agent
+    litellm_params:
+      model: openrouter/google/gemini-2.5-flash-preview:thinking
+
+  - model_name: text-embedding
+    litellm_params:
+      model: ollama/nomic-embed-text:latest
 
   # General Models by Vendor & Name 
   - model_name: anthropic-claude-3.7-sonnet

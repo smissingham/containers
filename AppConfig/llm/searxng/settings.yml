@@ -129,11 +129,11 @@ ui:
   # it decreases the privacy, since the browser can records the page titles.
   query_in_title: false
   # infinite_scroll: When true, automatically loads the next page when scrolling to bottom of the current page.
-  infinite_scroll: false
+  infinite_scroll: true
   # ui theme
   default_theme: simple
   # center the results ?
-  center_alignment: false
+  center_alignment: true
   # URL prefix of the internet archive, don't forget trailing slash (if needed).
   # cache_url: "https://webcache.googleusercontent.com/search?q=cache:"
   # Default interface locale - leave blank to detect from browser information or
@@ -176,17 +176,17 @@ ui:
 #
 outgoing:
   # default timeout in seconds, can be override by engine
-  request_timeout: 3.0
+  request_timeout: 10.0
   # the maximum timeout in seconds
   # max_request_timeout: 10.0
   # suffix of searx_useragent, could contain information like an email address
   # to the administrator
   useragent_suffix: ""
   # The maximum number of concurrent connections that may be established.
-  pool_connections: 100
+  pool_connections: 500
   # Allow the connection pool to maintain keep-alive connections below this
   # point.
-  pool_maxsize: 20
+  pool_maxsize: 50
   # See https://www.python-httpx.org/http2/
   enable_http2: true
   # uncomment below section if you want to use a custom server certificate
@@ -531,6 +531,7 @@ engines:
   - name: wikipedia
     engine: wikipedia
     shortcut: wp
+    disabled: true
     # add "list" to the array to get results in the results list
     display_type: ["infobox"]
     categories: [general]
@@ -811,6 +812,7 @@ engines:
   - name: wikidata
     engine: wikidata
     shortcut: wd
+    disabled: true
     timeout: 3.0
     weight: 2
     # add "list" to the array to get results in the results list
@@ -1949,6 +1951,7 @@ engines:
   - name: startpage
     engine: startpage
     shortcut: sp
+    disabled: true
     startpage_categ: web
     categories: [general, web]
     additional_tests:
@@ -1956,12 +1959,14 @@ engines:
 
   - name: startpage news
     engine: startpage
+    disabled: true
     startpage_categ: news
     categories: [news, web]
     shortcut: spn
 
   - name: startpage images
     engine: startpage
+    disabled: true
     startpage_categ: images
     categories: [images, web]
     shortcut: spi

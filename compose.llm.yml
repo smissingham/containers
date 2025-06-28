@@ -5,6 +5,24 @@ networks:
     external: true
 
 services:
+  ragflow:
+    container_name: ragflow
+    image: infiniflow/ragflow:v0.19.0-slim
+    restart: always
+    environment:
+      - TZ=${TZ}
+    volumes:
+      - ${APP_DATA}/llm/ragflow:/app/data
+    ports:
+      - 8888:80
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.ragflow.rule=Host(`ragflow.${ROOT_DOMAIN}`)
+      - traefik.http.routers.ragflow.tls=true
+      - traefik.http.routers.ragflow.entrypoints=websecure
+      - traefik.http.routers.ragflow.tls.certresolver=resolver
+      - traefik.http.services.ragflow.loadbalancer.server.port=80
+
   searxng:
     container_name: searxng
     image: searxng/searxng
@@ -36,8 +54,8 @@ services:
       # force config reload from these env vars instead of persisting to appdata folder
       - ENABLE_PERSISTENT_CONFIG=False
 
-      - ENABLE_DIRECT_CONNECTIONS=False
-      - ENABLE_OLLAMA_API=False
+      - ENABLE_DIRECT_CONNECTIONS=True
+      - ENABLE_OLLAMA_API=True
       - OLLAMA_BASE_URL=http://ollama:11434
 
       #- WEBUI_AUTH=False
@@ -48,10 +66,13 @@ services:
       - SEARXNG_QUERY_URL=http://searxng:8080/search?q=<query>
 
       - TAVILY_API_KEY=${TAVILY_API_KEY}
+      #- OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
 
       - ENABLE_OPENAI_API=True
-      - OPENAI_API_BASE_URL=https://litellm.${ROOT_DOMAIN}/v1
-      - OPENAI_API_KEY=${LITELLM_MASTER_KEY}
+      #- OPENAI_API_BASE_URL=https://litellm.${ROOT_DOMAIN}/v1
+      #- OPENAI_API_KEY=${LITELLM_MASTER_KEY}
+      - OPENAI_API_BASE_URL=https://openrouter.ai/api/v1
+      - OPENAI_API_KEY=${OPENROUTER_API_KEY}
       - PDF_EXTRACT_IMAGES=True
 
       - USE_CUDA_DOCKER=True
