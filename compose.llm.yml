@@ -13,7 +13,7 @@ services:
       - INSTANCE_NAME=smissingham
       - BASE_URL="https://searxng.${ROOT_DOMAIN}"
     volumes:
-      - ${APP_DATA}/llm/searxng:/etc/searxng
+      - ${APP_CONFIG}/llm/searxng:/etc/searxng
     labels:
       - traefik.enable=true
       - traefik.http.routers.searxng.rule=Host(`searxng.${ROOT_DOMAIN}`)
